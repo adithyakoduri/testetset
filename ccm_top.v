@@ -48,7 +48,7 @@ module ccm_top
     wire fifo_rd_en;
 
     assign fifo_din = {i_r, i_g, i_b};
-assign fifo_rd_en = 1'b0;
+
     //--------------------------------------------------
     // Async FIFO
     //--------------------------------------------------

@@ -60,7 +60,7 @@ localparam ROUT_MUL  = 3'd1;
 localparam GOUT_MUL  = 3'd2;
 localparam BOUT_MUL  = 3'd3;
 localparam WRITE_OUT = 3'd4;
-localparam READ_FIFO = 3'd5;
+
 reg [2:0] state;
 
 
@@ -159,22 +159,19 @@ begin
         //--------------------------------------------------
 
         IDLE:
-begin
-    if(!fifo_empty)
-    begin
-        fifo_rd_en <= 1'b1;
-        state <= READ_FIFO;
-    end
-end
+        begin
+            if(!fifo_empty)
+            begin
+            $display("[%0t] ENGINE READ REQUEST", $time);
+                fifo_rd_en <= 1'b1;
 
-READ_FIFO:
-begin
-    r_reg <= fifo_dout[47:32];
-    g_reg <= fifo_dout[31:16];
-    b_reg <= fifo_dout[15:0];
+                r_reg <= fifo_dout[47:32];
+                g_reg <= fifo_dout[31:16];
+                b_reg <= fifo_dout[15:0];
 
-    state <= ROUT_MUL;
-end
+                state <= ROUT_MUL;
+            end
+        end
 
         //--------------------------------------------------
         // ROUT
