@@ -148,6 +148,7 @@ begin
 
     repeat(10) @(posedge pixel_clk);
 
+
     pixel_rst_n = 1;
     ccm_rst_n   = 1;
 
@@ -203,29 +204,25 @@ begin
 
     while(!$feof(fin))
 begin
-     $display("Reading next pixel...");
+     
 
     status = $fscanf(fin,
                      "%d %d %d\n",
                      file_r,
                      file_g,
                      file_b);
-    $display("status=%0d r=%0d g=%0d b=%0d",
-         status,
-         file_r,
-         file_g,
-         file_b);
+   
     if(status == 3)
     begin
-        if(fifo_full)
-            $display("[%0t] FIFO FULL ASSERTED", $time);
+        //if(fifo_full)
+           // $display("[%0t] FIFO FULL ASSERTED", $time);
         @(posedge pixel_clk);
         
-        while(fifo_full)
+        /*while(fifo_full)
         begin
             $display("[%0t] FIFO FULL", $time);
             @(posedge pixel_clk);
-        end
+        end*/
 
         i_valid <= 1'b1;
         i_r     <= file_r;
@@ -234,13 +231,7 @@ begin
 
         pixel_count = pixel_count + 1;
 
-        $display("[%0t] INPUT PIXEL %0d : R=%0d G=%0d B=%0d",
-                 $time,
-                 pixel_count,
-                 file_r,
-                 file_g,
-                 file_b);
-
+        
         @(posedge pixel_clk);
 
         i_valid <= 1'b0;
@@ -271,46 +262,10 @@ end
 //====================================================
 // Output Monitor
 //====================================================
-always @(posedge ccm_clk)
-begin
-    if(ccm_rst_n)
-    begin
-        $display("[%0t] in=%0d out=%0d full=%0b empty=%0b rd_en=%0b o_valid=%0b",
-                 $time,
-                 pixel_count,
-                 output_count,
-                 fifo_full,
-                 dut.fifo_empty,
-                 dut.fifo_rd_en,
-                 o_valid);
-    end
-end
-always @(posedge ccm_clk)
-begin
-    if(ccm_rst_n)
-    begin
-        $display("[%0t] state=%0d empty=%0b rd_en=%0b",
-                 $time,
-                 dut.u_ccm_engine.state,
-                 dut.fifo_empty,
-                 dut.fifo_rd_en);
-    end
-end
-always @(posedge ccm_clk)
-begin
-    if(ccm_rst_n)
-    begin
-        if(dut.fifo_rd_en || o_valid)
-        begin
-            $display("[%0t] empty=%0b rd_en=%0b o_valid=%0b out=%0d",
-                     $time,
-                     dut.fifo_empty,
-                     dut.fifo_rd_en,
-                     o_valid,
-                     output_count);
-        end
-    end
-end
+
+
+
+
 always @(posedge ccm_clk)
 begin
 
@@ -319,13 +274,7 @@ begin
 
         output_count = output_count + 1;
 
-        $display("[%0t] OUTPUT PIXEL %0d : R=%0d G=%0d B=%0d",
-                 $time,
-                 output_count,
-                 o_r,
-                 o_g,
-                 o_b);
-
+        
         $fwrite(fout,
                 "%0d %0d %0d\n",
                 o_r,
@@ -336,36 +285,7 @@ begin
 
 end
 
-//====================================================
-// FIFO Debug
-//====================================================
 
-always @(posedge pixel_clk)
-begin
 
-    if(i_valid)
-    begin
-        $display("[%0t] FIFO WRITE : R=%0d G=%0d B=%0d",
-                 $time,
-                 i_r,
-                 i_g,
-                 i_b);
-    end
-
-end
-
-//====================================================
-// Timeout Protection
-//====================================================
-
-initial
-begin
-
-    #100000;
-
-    $display("TIMEOUT");
-    $finish;
-
-end
 
 endmodule

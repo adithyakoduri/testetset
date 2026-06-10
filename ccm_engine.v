@@ -120,11 +120,7 @@ endfunction
 //====================================================
 // Main FSM
 //====================================================
-always @(posedge clk)
-begin
-    if(rst_n)
-        $display("[%0t] CCM STATE=%0d", $time, state);
-end
+
 always @(posedge clk or negedge rst_n)
 begin
     if(!rst_n)
